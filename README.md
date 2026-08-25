@@ -9,6 +9,7 @@ that any dsh filesystem provider discovers and any agent can load.
 |---|---|
 | [`dsh-plugin-authoring`](dsh-plugin-authoring/SKILL.md) | Guidance distilled from a working session on **authoring a third-party dsh plugin** (node half, browser client half, or both): the bundle/profile installation model, the real client-bundle contract, and the deltas between the published plugin docs' sample code and the shipped harness — plus package layout, node/browser half rules, verification, and current version facts. |
 | [`trufflehog-pre-push`](trufflehog-pre-push/SKILL.md) | **Scan a git project for secrets with TruffleHog in Docker before pushing** and gate on zero results — filesystem/history scan commands, `--fail` (exit 183) semantics, path exclusions, how to read verified vs unverified hits, the pushed-secrets-stay-in-history caveat, and a supplementary host-info sweep. |
+| [`unslop`](unslop/SKILL.md) | **Cut AI tells from any writing** and add human voice. Scans for 31 patterns (puffery, AI vocabulary, overused em dashes and colons, chatbot phrases, filler, jargon), then guides a rewrite that keeps meaning and the intended tone. Must always apply when writing. Original source: [cursor/plugins: pstack/skills/unslop](https://github.com/cursor/plugins/tree/main/pstack/skills/unslop). |
 
 ## Skill format
 
@@ -39,11 +40,13 @@ git clone https://github.com/n0pe-sled/deepseek-harness-skills.git ~/dsh-skills
 mkdir -p ~/.agents/skills
 cp -R ~/dsh-skills/dsh-plugin-authoring \
       ~/dsh-skills/trufflehog-pre-push \
+      ~/dsh-skills/unslop \
       ~/.agents/skills/
 
 # or symlink instead, so `git pull` updates each in place:
 ln -s ~/dsh-skills/dsh-plugin-authoring  ~/.agents/skills/dsh-plugin-authoring
 ln -s ~/dsh-skills/trufflehog-pre-push   ~/.agents/skills/trufflehog-pre-push
+ln -s ~/dsh-skills/unslop                ~/.agents/skills/unslop
 ```
 
 The provider watches these roots, so the skill appears in the next catalog
@@ -59,6 +62,7 @@ third-party GitHub-skill installer also manages via `~/.agents/.skill-lock.json`
 mkdir -p "$DSH_HOME/skills"     # or "$HOME/.dsh/skills"
 cp -R ~/dsh-skills/dsh-plugin-authoring \
       ~/dsh-skills/trufflehog-pre-push \
+      ~/dsh-skills/unslop \
       "$DSH_HOME/skills/"
 ```
 
@@ -69,6 +73,7 @@ cp -R ~/dsh-skills/dsh-plugin-authoring \
 # start a session and reference the skill by name, or list it via:
 ls ~/.agents/skills/dsh-plugin-authoring/SKILL.md
 ls ~/.agents/skills/trufflehog-pre-push/SKILL.md
+ls ~/.agents/skills/unslop/SKILL.md
 ```
 
 ## Updating
