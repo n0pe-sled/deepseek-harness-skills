@@ -8,6 +8,7 @@ that any dsh filesystem provider discovers and any agent can load.
 | Skill | What it does |
 |---|---|
 | [`dsh-plugin-authoring`](dsh-plugin-authoring/SKILL.md) | Guidance distilled from a working session on **authoring a third-party dsh plugin** (node half, browser client half, or both): the bundle/profile installation model, the real client-bundle contract, and the deltas between the published plugin docs' sample code and the shipped harness — plus package layout, node/browser half rules, verification, and current version facts. |
+| [`trufflehog-pre-push`](trufflehog-pre-push/SKILL.md) | **Scan a git project for secrets with TruffleHog in Docker before pushing** and gate on zero results — filesystem/history scan commands, `--fail` (exit 183) semantics, path exclusions, how to read verified vs unverified hits, the pushed-secrets-stay-in-history caveat, and a supplementary host-info sweep. |
 
 ## Skill format
 
@@ -36,10 +37,13 @@ git clone https://github.com/n0pe-sled/deepseek-harness-skills.git ~/dsh-skills
 
 # into the shared agent user root (~/.agents/skills also hosts installed skills)
 mkdir -p ~/.agents/skills
-cp -R ~/dsh-skills/dsh-plugin-authoring ~/.agents/skills/
+cp -R ~/dsh-skills/dsh-plugin-authoring \
+      ~/dsh-skills/trufflehog-pre-push \
+      ~/.agents/skills/
 
-# or symlink instead, so `git pull` updates it in place:
-ln -s ~/dsh-skills/dsh-plugin-authoring ~/.agents/skills/dsh-plugin-authoring
+# or symlink instead, so `git pull` updates each in place:
+ln -s ~/dsh-skills/dsh-plugin-authoring  ~/.agents/skills/dsh-plugin-authoring
+ln -s ~/dsh-skills/trufflehog-pre-push   ~/.agents/skills/trufflehog-pre-push
 ```
 
 The provider watches these roots, so the skill appears in the next catalog
@@ -53,7 +57,9 @@ third-party GitHub-skill installer also manages via `~/.agents/.skill-lock.json`
 
 ```bash
 mkdir -p "$DSH_HOME/skills"     # or "$HOME/.dsh/skills"
-cp -R ~/dsh-skills/dsh-plugin-authoring "$DSH_HOME/skills/"
+cp -R ~/dsh-skills/dsh-plugin-authoring \
+      ~/dsh-skills/trufflehog-pre-push \
+      "$DSH_HOME/skills/"
 ```
 
 ## Verify
@@ -62,6 +68,7 @@ cp -R ~/dsh-skills/dsh-plugin-authoring "$DSH_HOME/skills/"
 # the skill is discoverable when it appears in the catalog; for the web GUI,
 # start a session and reference the skill by name, or list it via:
 ls ~/.agents/skills/dsh-plugin-authoring/SKILL.md
+ls ~/.agents/skills/trufflehog-pre-push/SKILL.md
 ```
 
 ## Updating
