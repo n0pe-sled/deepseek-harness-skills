@@ -78,11 +78,11 @@ git clone https://github.com/n0pe-sled/deepseek-harness-skills.git ~/dsh-skills
 
 # into the shared agent user root (~/.agents/skills also hosts installed skills)
 mkdir -p ~/.agents/skills
-find ~/dsh-skills -mindepth 2 -maxdepth 2 -name SKILL.md \
+find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
   -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
 
 # or symlink each bundle instead, so `git pull` updates them in place:
-find ~/dsh-skills -mindepth 2 -maxdepth 2 -name SKILL.md \
+find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
   -exec sh -c 'ln -s "$(dirname "$1")" ~/.agents/skills/' _ {} \;
 ```
 
@@ -97,7 +97,7 @@ third-party GitHub-skill installer also manages via `~/.agents/.skill-lock.json`
 
 ```bash
 mkdir -p "$DSH_HOME/skills"     # or "$HOME/.dsh/skills"
-find ~/dsh-skills -mindepth 2 -maxdepth 2 -name SKILL.md \
+find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
   -exec sh -c 'cp -R "$(dirname "$1")" "$DSH_HOME/skills/"' _ {} \;
 ```
 
