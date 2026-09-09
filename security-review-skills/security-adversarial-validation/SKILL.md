@@ -1,6 +1,8 @@
 ---
 name: security-adversarial-validation
 description: Use as the sole foreground worker to independently falsify or reproduce a promoted security candidate from frozen inputs and a clean authorized target
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Adversarial Validation

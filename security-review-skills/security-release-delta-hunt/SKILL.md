@@ -1,6 +1,8 @@
 ---
 name: security-release-delta-hunt
 description: Use as the sole foreground worker to diff the pinned epoch against prior releases and decide whether newly changed code carries a reachable primitive before any live work
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Release Delta Hunt

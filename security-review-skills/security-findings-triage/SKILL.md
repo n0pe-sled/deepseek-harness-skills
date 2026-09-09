@@ -1,6 +1,8 @@
 ---
 name: security-findings-triage
 description: Use when a test turns up a finding outside the campaign objective, to classify it and decide whether it composes toward the goal without pulling the campaign off its primary path
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Findings Triage

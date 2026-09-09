@@ -1,6 +1,8 @@
 ---
 name: security-infrastructure-operator
 description: Use as the sole foreground worker for AWS, Ludus, Docker, or local security-lab discovery, snapshotting, artifact refresh, readiness, cleanup, or recovery
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Infrastructure Operator

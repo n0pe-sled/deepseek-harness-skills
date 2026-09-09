@@ -1,6 +1,6 @@
 # deepseek-harness-skills
 
-A personal collection of reusable **skills** for the
+A personal collection of 14 reusable **skills** for the
 [DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness).
 Each skill is a standard skill bundle (`<name>/SKILL.md` with YAML frontmatter)
 that any dsh filesystem provider discovers and any agent can load.
@@ -15,7 +15,7 @@ so installation flattens every bundle into the watched root by its name.
 |---|---|
 | `security-review-skills/` | The security research campaign skills: scope, orchestration, discovery, simulation, validation, findings, delta hunts, infrastructure, Ludus, and session export. |
 | `generic-skills/` | Self-authored skills that apply to any development flow: dsh plugin authoring and pre-push secret scanning. |
-| `third-party-skills/` | Skills vendored from other projects, kept with their source attribution. |
+| `third-party-skills/` | The vendored `unslop` writing skill, kept with its source attribution. |
 
 ## Generic skills
 
@@ -49,35 +49,6 @@ any one target.
 | Skill | What it does |
 |---|---|
 | [`unslop`](third-party-skills/unslop/SKILL.md) | **Cut AI tells from any writing** and add human voice. Scans for 31 patterns (puffery, AI vocabulary, overused em dashes and colons, chatbot phrases, filler, jargon), then guides a rewrite that keeps meaning and the intended tone. Must always apply when writing. Original source: [cursor/plugins: pstack/skills/unslop](https://github.com/cursor/plugins/tree/main/pstack/skills/unslop). |
-
-### Ported security review skills
-
-Security review and testing skills vendored from
-[dreadnode/capabilities](https://github.com/dreadnode/capabilities) (MIT) and
-the [Trail of Bits skills marketplace](https://github.com/trailofbits/skills)
-(CC BY-SA 4.0). Full attribution, per-bundle source, and adaptation notes live
-in [third-party-skills/README.md](third-party-skills/README.md); the review
-that selected them is in [SKILLS-REVIEW.md](SKILLS-REVIEW.md).
-
-The core set applies to any review and is the default install:
-
-| Skill | What it does |
-|---|---|
-| [`audit-context-building`](third-party-skills/audit-context-building/SKILL.md) | Understand a codebase before hunting: per-function assumptions, guarantees, and dependencies. |
-| [`fp-check`](third-party-skills/fp-check/SKILL.md) | Systematic TRUE/FALSE positive verification with mandated gate reviews. |
-| [`differential-review`](third-party-skills/differential-review/SKILL.md) | Security diff review: git blame, blast radius, test-gap checks, report file. |
-| [`semgrep`](third-party-skills/semgrep/SKILL.md), [`codeql`](third-party-skills/codeql/SKILL.md), [`sarif-parsing`](third-party-skills/sarif-parsing/SKILL.md) | Static analysis workhorses with merged SARIF output. |
-| [`supply-chain-risk-auditor`](third-party-skills/supply-chain-risk-auditor/SKILL.md) | Dependency risk report: advisories, abandonment, publisher concentration, install scripts. |
-| [`vuln-assessment-methodology`](third-party-skills/vuln-assessment-methodology/SKILL.md) | Base discipline: source-to-sink tracing, disprove-first, threat-model severity. |
-| [`security-awareness`](third-party-skills/security-awareness/SKILL.md) | Keep the agent itself from phishing, credential theft, and social engineering. |
-
-The rest are opt-in, in four groups: five web pentesting playbooks
-(`403-bypass`, `csp-bypass`, `ssrf-ip-filter-bypass`, `graphql-pentest`,
-`http-desync-smuggling`), fourteen fuzzing skills from the ToB Testing
-Handbook, and eleven smart contract audit skills. See the
-[third-party README](third-party-skills/README.md) for the full list. They are
-present in the repo but not loaded into the catalog unless you symlink them
-into your agent skills root.
 
 ## Skill format
 

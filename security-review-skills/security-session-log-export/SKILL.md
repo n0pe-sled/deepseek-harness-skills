@@ -1,6 +1,8 @@
 ---
 name: security-session-log-export
 description: Use at campaign closeout or on operator request to freeze the session record into auditable transcripts and metadata
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Session Log Export

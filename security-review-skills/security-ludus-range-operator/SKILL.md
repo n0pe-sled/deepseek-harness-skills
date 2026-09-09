@@ -1,6 +1,8 @@
 ---
 name: security-ludus-range-operator
 description: Use as the sole foreground worker when the campaign target is a Ludus-hosted lab range, covering range lifecycle, role deploys, testing state, snapshots, VM access, and the clean-reset path
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Ludus Range Operator

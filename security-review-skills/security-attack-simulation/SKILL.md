@@ -1,6 +1,8 @@
 ---
 name: security-attack-simulation
 description: Use as the sole foreground worker to compose supported primitives, build protocol fixtures, and execute bounded experiments on an authorized prepared target
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Attack Simulation

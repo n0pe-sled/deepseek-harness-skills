@@ -1,6 +1,8 @@
 ---
 name: security-campaign-orchestration
 description: Use when starting, resuming, routing, or stopping an authorized long-running vulnerability research campaign with one foreground worker at a time
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Campaign Orchestration

@@ -1,6 +1,8 @@
 ---
 name: security-anonymous-oracle-audit
 description: Use to enumerate and test the anonymous web surface including controller, meta, and slug routes, applying the known-vs-unknown differential before any read surface is certified clean
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security Anonymous Oracle Audit

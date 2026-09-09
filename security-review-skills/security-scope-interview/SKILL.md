@@ -1,6 +1,8 @@
 ---
 name: security-scope-interview
 description: Use when an operator wants to create, refine, or review a security campaign SCOPE.md through a targeted discussion before research begins
+disable-model-invocation: true
+user-invocable: false
 ---
 
 # Security scope interview
