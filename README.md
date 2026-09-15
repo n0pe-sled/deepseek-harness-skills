@@ -1,9 +1,11 @@
 # deepseek-harness-skills
 
 A personal collection of 14 reusable **skills** for the
-[DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness).
-Each skill is a standard skill bundle (`<name>/SKILL.md` with YAML frontmatter)
-that any dsh filesystem provider discovers and any agent can load.
+[DeepSeek Harness (dsh)](https://github.com/deepseek-ai/deepseek-harness), plus a
+git submodule that brings in 75 more from
+[SpecterOps/skills](https://github.com/SpecterOps/skills). Each skill is a
+standard skill bundle (`<name>/SKILL.md` with YAML frontmatter) that any dsh
+filesystem provider discovers and any agent can load.
 
 ## Layout
 
@@ -15,7 +17,7 @@ so installation flattens every bundle into the watched root by its name.
 |---|---|
 | `security-review-skills/` | The security research campaign skills: scope, orchestration, discovery, simulation, validation, findings, delta hunts, infrastructure, Ludus, and session export. |
 | `generic-skills/` | Self-authored skills that apply to any development flow: dsh plugin authoring and pre-push secret scanning. |
-| `third-party-skills/` | The vendored `unslop` writing skill, kept with its source attribution. |
+| `third-party-skills/` | The vendored `unslop` writing skill and the `specterops-skills` git submodule. |
 
 ## Generic skills
 
@@ -49,6 +51,23 @@ any one target.
 | Skill | What it does |
 |---|---|
 | [`unslop`](third-party-skills/unslop/SKILL.md) | **Cut AI tells from any writing** and add human voice. Scans for 31 patterns (puffery, AI vocabulary, overused em dashes and colons, chatbot phrases, filler, jargon), then guides a rewrite that keeps meaning and the intended tone. Must always apply when writing. Original source: [cursor/plugins: pstack/skills/unslop](https://github.com/cursor/plugins/tree/main/pstack/skills/unslop). |
+| [`specterops-skills`](third-party-skills/specterops-skills/) | **75 offensive-security and engineering skills** from [SpecterOps](https://github.com/SpecterOps/skills), pinned as a git submodule. Apache-2.0. Ships as 25 plugin bundles, listed below. Not edited by us; see [third-party-skills/README.md](third-party-skills/README.md) for how to bump the pin. |
+
+The SpecterOps bundles, by what they cover:
+
+| Group | Bundles |
+|---|---|
+| Attack paths | `bloodhound` (BloodHound, AzureHound, GitHound/JamfHound/OktaHound) |
+| C2 | `c2-cobaltstrike`, `c2-mythic`, `c2-outflankc2`, `c2-extensions` |
+| Internal ops | `ops-sccm`, `ops-reconnaissance`, `ops-appsec`, `ops-infrastructure`, `ops-adcs` and `ops-mssql` (placeholders, no skills yet) |
+| Payloads and tradecraft | `payloads`, `tradecraft-windows`, `tradecraft-mac`, `tradecraft-linux` |
+| Deliverables | `report-drafting`, `report-timeline` |
+| Code review | `go-review`, `code-review-and-qa`, plus `cwe-code-review`, `owasp-security-code-review`, `openssf-python-review` at the upstream `skills/` dir |
+| Other | `reverse-engineering`, `social-engineering`, `ludus`, `codex-observability`, `workflows-research`, `workflows-development` |
+
+Upstream also ships 21 agent definitions in `agents/*.toml` and Codex/Claude plugin
+manifests. dsh reads neither, so they are dead weight here. No skill name collides
+with a skill we own.
 
 ## Skill format
 
@@ -73,17 +92,49 @@ Clone the repo somewhere stable, then copy (or symlink) each skill bundle into
 a user root the filesystem provider watches. The install scripts below walk the
 category folders and emit each bundle flat by its name.
 
-```bash
-git clone https://github.com/n0pe-sled/deepseek-harness-skills.git ~/dsh-skills
+Clone with the submodule, or the SpecterOps folder arrives empty:
 
+```bash
+git clone --recurse-submodules \
+  https://github.com/n0pe-sled/deepseek-harness-skills.git ~/dsh-skills
+# already cloned? fill it in:
+git -C ~/dsh-skills submodule update --init --recursive
+```
+
+Install our own 14 bundles (they sit one level below a category folder):
+
+```bash
 # into the shared agent user root (~/.agents/skills also hosts installed skills)
 mkdir -p ~/.agents/skills
 find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
+  -not -path '*/specterops-skills/*' \
   -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
 
 # or symlink each bundle instead, so `git pull` updates them in place:
 find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
+  -not -path '*/specterops-skills/*' \
   -exec sh -c 'ln -s "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+```
+
+Install the SpecterOps bundles separately. They sit deeper, at
+`plugins/<plugin>/skills/<name>/SKILL.md`, so the shallow walk above skips them:
+
+```bash
+find ~/dsh-skills/third-party-skills/specterops-skills \
+  -mindepth 3 -maxdepth 5 -name SKILL.md \
+  -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+```
+
+That drops all 75 into the same root. The catalog gets long, and most of it is
+irrelevant to a given engagement. To install selectively, narrow the walk to the
+plugins you want:
+
+```bash
+for p in bloodhound ops-reconnaissance ludus; do
+  find ~/dsh-skills/third-party-skills/specterops-skills/plugins/$p \
+    -name SKILL.md \
+    -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+done
 ```
 
 The provider watches these roots, so a skill appears in the next catalog
@@ -97,7 +148,7 @@ third-party GitHub-skill installer also manages via `~/.agents/.skill-lock.json`
 
 ```bash
 mkdir -p "$DSH_HOME/skills"     # or "$HOME/.dsh/skills"
-find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
+find ~/dsh-skills -mindepth 2 -maxdepth 6 -name SKILL.md \
   -exec sh -c 'cp -R "$(dirname "$1")" "$DSH_HOME/skills/"' _ {} \;
 ```
 
@@ -110,6 +161,8 @@ ls ~/.agents/skills/dsh-plugin-authoring/SKILL.md
 ls ~/.agents/skills/trufflehog-pre-push/SKILL.md
 ls ~/.agents/skills/unslop/SKILL.md
 ls ~/.agents/skills/security-*/SKILL.md  # all security research skills
+ls ~/.agents/skills/bloodhound-query/SKILL.md ~/.agents/skills/ludus-development/SKILL.md
+ls ~/.agents/skills/*/SKILL.md | wc -l   # 89 if you installed everything
 ```
 
 ## Updating
@@ -117,6 +170,10 @@ ls ~/.agents/skills/security-*/SKILL.md  # all security research skills
 ```bash
 git -C ~/dsh-skills pull
 ```
+
+`git pull` does not move the submodule. It stays at the pinned commit until you
+run `git submodule update --remote` and commit the new pointer. See
+[third-party-skills/README.md](third-party-skills/README.md).
 
 Copy-installed skills need the copy refreshed (re-`cp`); symlinked skills pick
 up the new content automatically.
