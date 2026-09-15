@@ -9,15 +9,16 @@ filesystem provider discovers and any agent can load.
 
 ## Layout
 
-Skills are grouped into three folders by origin and purpose. The folders are
-source organization only. dsh discovers skills flat, one level deep per root,
-so installation flattens every bundle into the watched root by its name.
+Skills live in four category folders. The folders are source organization only.
+dsh discovers skills flat, one level deep per root, so installation flattens
+every bundle into the watched root by its name.
 
 | Folder | Contents |
 |---|---|
 | `security-review-skills/` | The security research campaign skills: scope, orchestration, discovery, simulation, validation, findings, delta hunts, infrastructure, Ludus, and session export. |
 | `generic-skills/` | Self-authored skills that apply to any development flow: dsh plugin authoring and pre-push secret scanning. |
-| `third-party-skills/` | The vendored `unslop` writing skill and the `specterops-skills` git submodule. |
+| `specterops-skills/` | A git submodule pinned to [SpecterOps/skills](https://github.com/SpecterOps/skills). 75 offensive-security and engineering skills across 25 upstream plugin bundles. Apache-2.0. |
+| `third-party-skills/` | The vendored `unslop` writing skill, kept with its source attribution. |
 
 ## Generic skills
 
@@ -46,14 +47,14 @@ any one target.
 | [`security-ludus-range-operator`](security-review-skills/security-ludus-range-operator/SKILL.md) | Ludus-specific guide: range lifecycle, role deploys, testing state as the clean-reset mechanism, snapshots, VM access, and re-freezing after changes. |
 | [`security-session-log-export`](security-review-skills/security-session-log-export/SKILL.md) | Freeze a campaign's session record into auditable transcripts and metadata at closeout, with the secrets policy stated up front. |
 
-## Third-party skills
+## SpecterOps skills
 
-| Skill | What it does |
+A git submodule pinned to one upstream commit, not a copy of the tree. Apache-2.0.
+We do not edit these in place.
+
+| Bundle | What it does |
 |---|---|
-| [`unslop`](third-party-skills/unslop/SKILL.md) | **Cut AI tells from any writing** and add human voice. Scans for 31 patterns (puffery, AI vocabulary, overused em dashes and colons, chatbot phrases, filler, jargon), then guides a rewrite that keeps meaning and the intended tone. Must always apply when writing. Original source: [cursor/plugins: pstack/skills/unslop](https://github.com/cursor/plugins/tree/main/pstack/skills/unslop). |
-| [`specterops-skills`](third-party-skills/specterops-skills/) | **75 offensive-security and engineering skills** from [SpecterOps](https://github.com/SpecterOps/skills), pinned as a git submodule. Apache-2.0. Ships as 25 plugin bundles, listed below. Not edited by us; see [third-party-skills/README.md](third-party-skills/README.md) for how to bump the pin. |
-
-The SpecterOps bundles, by what they cover:
+| [`specterops-skills`](specterops-skills/) | **75 offensive-security and engineering skills** from [SpecterOps](https://github.com/SpecterOps/skills). BloodHound attack paths, Cobalt Strike / Mythic / Outflank C2 development, BOF authoring, SCCM takeover validation, recon and OSINT, appsec review, payloads and platform tradecraft, report drafting, reverse engineering, social engineering, and a Ludus range skill. Grouped below. |
 
 | Group | Bundles |
 |---|---|
@@ -66,8 +67,32 @@ The SpecterOps bundles, by what they cover:
 | Other | `reverse-engineering`, `social-engineering`, `ludus`, `codex-observability`, `workflows-research`, `workflows-development` |
 
 Upstream also ships 21 agent definitions in `agents/*.toml` and Codex/Claude plugin
-manifests. dsh reads neither, so they are dead weight here. No skill name collides
-with a skill we own.
+manifests. dsh reads neither. No skill name collides with a skill we own.
+
+### Bumping the pin
+
+`git pull` in this repo does not move the submodule. It stays at the pinned commit
+until you advance it and commit the new pointer:
+
+```bash
+git submodule update --remote specterops-skills
+git add specterops-skills
+git commit -m "Bump SpecterOps skills submodule"
+```
+
+Pin a specific commit instead of tracking `main` if you want the move to be
+deliberate:
+
+```bash
+git -C specterops-skills checkout <sha>
+git add specterops-skills && git commit -m "Pin SpecterOps skills at <sha>"
+```
+
+## Third-party skills
+
+| Skill | What it does |
+|---|---|
+| [`unslop`](third-party-skills/unslop/SKILL.md) | **Cut AI tells from any writing** and add human voice. Scans for 31 patterns (puffery, AI vocabulary, overused em dashes and colons, chatbot phrases, filler, jargon), then guides a rewrite that keeps meaning and the intended tone. Must always apply when writing. Original source: [cursor/plugins: pstack/skills/unslop](https://github.com/cursor/plugins/tree/main/pstack/skills/unslop). |
 
 ## Skill format
 
@@ -101,38 +126,38 @@ git clone --recurse-submodules \
 git -C ~/dsh-skills submodule update --init --recursive
 ```
 
-Install our own 14 bundles (they sit one level below a category folder):
+Our own 14 bundles sit one level under a category folder:
 
 ```bash
 # into the shared agent user root (~/.agents/skills also hosts installed skills)
 mkdir -p ~/.agents/skills
-find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
-  -not -path '*/specterops-skills/*' \
-  -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+for d in generic-skills security-review-skills third-party-skills; do
+  find ~/dsh-skills/$d -mindepth 2 -maxdepth 2 -name SKILL.md \
+    -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+done
 
 # or symlink each bundle instead, so `git pull` updates them in place:
-find ~/dsh-skills -mindepth 2 -maxdepth 3 -name SKILL.md \
-  -not -path '*/specterops-skills/*' \
-  -exec sh -c 'ln -s "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+for d in generic-skills security-review-skills third-party-skills; do
+  find ~/dsh-skills/$d -mindepth 2 -maxdepth 2 -name SKILL.md \
+    -exec sh -c 'ln -s "$(dirname "$1")" ~/.agents/skills/' _ {} \;
+done
 ```
 
-Install the SpecterOps bundles separately. They sit deeper, at
-`plugins/<plugin>/skills/<name>/SKILL.md`, so the shallow walk above skips them:
+The SpecterOps bundles sit deeper, at `plugins/<plugin>/skills/<name>/SKILL.md`,
+with three more at the upstream `skills/` dir:
 
 ```bash
-find ~/dsh-skills/third-party-skills/specterops-skills \
-  -mindepth 3 -maxdepth 5 -name SKILL.md \
+find ~/dsh-skills/specterops-skills -mindepth 3 -maxdepth 5 -name SKILL.md \
   -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
 ```
 
 That drops all 75 into the same root. The catalog gets long, and most of it is
 irrelevant to a given engagement. To install selectively, narrow the walk to the
-plugins you want:
+bundles you want:
 
 ```bash
 for p in bloodhound ops-reconnaissance ludus; do
-  find ~/dsh-skills/third-party-skills/specterops-skills/plugins/$p \
-    -name SKILL.md \
+  find ~/dsh-skills/specterops-skills/plugins/$p -name SKILL.md \
     -exec sh -c 'cp -R "$(dirname "$1")" ~/.agents/skills/' _ {} \;
 done
 ```
@@ -148,7 +173,12 @@ third-party GitHub-skill installer also manages via `~/.agents/.skill-lock.json`
 
 ```bash
 mkdir -p "$DSH_HOME/skills"     # or "$HOME/.dsh/skills"
-find ~/dsh-skills -mindepth 2 -maxdepth 6 -name SKILL.md \
+# same walks as above, destination swapped:
+for d in generic-skills security-review-skills third-party-skills; do
+  find ~/dsh-skills/$d -mindepth 2 -maxdepth 2 -name SKILL.md \
+    -exec sh -c 'cp -R "$(dirname "$1")" "$DSH_HOME/skills/"' _ {} \;
+done
+find ~/dsh-skills/specterops-skills -mindepth 3 -maxdepth 5 -name SKILL.md \
   -exec sh -c 'cp -R "$(dirname "$1")" "$DSH_HOME/skills/"' _ {} \;
 ```
 
@@ -172,8 +202,7 @@ git -C ~/dsh-skills pull
 ```
 
 `git pull` does not move the submodule. It stays at the pinned commit until you
-run `git submodule update --remote` and commit the new pointer. See
-[third-party-skills/README.md](third-party-skills/README.md).
+advance it. See [Bumping the pin](#bumping-the-pin).
 
 Copy-installed skills need the copy refreshed (re-`cp`); symlinked skills pick
 up the new content automatically.
